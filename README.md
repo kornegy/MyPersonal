@@ -74,9 +74,48 @@ rm src/Server/app.db     # drop the local database
 dotnet run --project src/Server   # it will be recreated and reseeded
 ```
 
-Fields marked `// TODO:` in `SeedData.cs` are placeholders (name, phone,
-LinkedIn / Telegram links, real project repos) — replace them with your details.
 Leave any contact field blank and it will simply be hidden in the UI.
+
+## Profile photo
+
+The hero avatar uses `Profile.PhotoUrl` (set in `SeedData.cs`). Drop your photo at
+`src/Client/wwwroot/img/nazar.jpg` (roughly square works best — it's cropped to a
+rounded square). A placeholder is included; just overwrite that file with your own.
+Set `PhotoUrl` to `""` to fall back to your initials instead of a photo.
+
+## Contact-form email
+
+When a visitor submits the contact form the message is stored in SQL **and**
+emailed to you. SMTP settings live in the `Email` section of
+`src/Server/appsettings.json` — everything except the **password**, which must be
+supplied as a secret and never committed.
+
+Using a Gmail account (recommended):
+
+1. Enable **2-Step Verification** on the Google account.
+2. Create an **App Password**: Google Account → Security → App passwords →
+   generate one for "Mail". You get a 16-character code.
+3. Provide it to the app as an environment variable (note the double underscore):
+
+   ```bash
+   export Email__Password="your-16-char-app-password"   # Linux/macOS
+   dotnet run --project src/Server
+   ```
+   ```powershell
+   $env:Email__Password="your-16-char-app-password"     # Windows PowerShell
+   dotnet run --project src/Server
+   ```
+
+   For local development you can instead use user-secrets:
+   ```bash
+   cd src/Server
+   dotnet user-secrets init
+   dotnet user-secrets set "Email:Password" "your-16-char-app-password"
+   ```
+
+If no password is configured, the message is still saved and the site falls back
+to opening the visitor's own email client — but nothing is delivered to your inbox
+automatically until the App Password is set.
 
 ## Design
 

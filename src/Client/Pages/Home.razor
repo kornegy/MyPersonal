@@ -17,7 +17,12 @@ else
     <header class="navbar-shell">
         <div class="container-x navbar-inner">
             <a href="#top" class="brand">
-                <span class="brand__mark">@Initials(p.FullName)</span>
+                <span class="brand__mark @(string.IsNullOrWhiteSpace(p.PhotoUrl) ? "" : "has-photo")">
+                    @if (!string.IsNullOrWhiteSpace(p.PhotoUrl))
+                    { <img src="@p.PhotoUrl" alt="@p.FullName" /> }
+                    else
+                    { @Initials(p.FullName) }
+                </span>
                 <span>@FirstName(p.FullName)</span>
             </a>
 
@@ -71,7 +76,12 @@ else
                 </div>
 
                 <div class="hero-card">
-                    <div class="avatar">@Initials(p.FullName)</div>
+                    <div class="avatar @(string.IsNullOrWhiteSpace(p.PhotoUrl) ? "" : "has-photo")">
+                        @if (!string.IsNullOrWhiteSpace(p.PhotoUrl))
+                        { <img src="@p.PhotoUrl" alt="@p.FullName" /> }
+                        else
+                        { @Initials(p.FullName) }
+                    </div>
                     <h3>@p.FullName</h3>
                     <div class="role">@p.Title</div>
                     <p style="color:var(--muted); font-size:.92rem;">
