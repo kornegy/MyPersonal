@@ -64,11 +64,11 @@ public static class SeedData
         {
             db.Skills.AddRange(
                 new SkillCategory { SortOrder = 1, Name = "Programming",
-                    Items = "C#, Python, PL/SQL, SQL, C, JavaScript" },
+                    Items = "C#, Python, PL/SQL, SQL, C" },
                 new SkillCategory { SortOrder = 2, Name = "Backend",
                     Items = "ASP.NET Core MVC, ASP.NET Core Web API, .NET 8, Entity Framework Core, REST API, Serilog, Razor" },
                 new SkillCategory { SortOrder = 3, Name = "Frontend",
-                    Items = "Blazor WebAssembly, Bootstrap, HTML, CSS, JavaScript" },
+                    Items = "Blazor WebAssembly, Bootstrap, HTML, CSS" },
                 new SkillCategory { SortOrder = 4, Name = "Databases",
                     Items = "MS SQL Server, Oracle, PL/SQL, Relational Design, ER Diagrams" },
                 new SkillCategory { SortOrder = 5, Name = "AI & Tools",
