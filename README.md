@@ -1,7 +1,7 @@
 # MyPersonal — Software Engineer portfolio
 
 A lightweight, fast, full-stack personal portfolio / business-card site for a
-**Software AI Engineer**. One clean landing page that tells a potential client
+**Software Engineer**. One clean landing page that tells a potential client
 who I am, what I've built, the technologies I use, and how to reach me.
 
 Built to be simple, quick to load, and easy to keep up to date — all the content
