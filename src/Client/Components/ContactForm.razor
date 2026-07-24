@@ -10,7 +10,7 @@
         {
             <div class="form-msg ok">
                 <i class="bi bi-check-circle"></i>
-                Thanks! Your message was saved and your email app has opened so you can send it straight to my inbox.
+                Thanks, @(_lastName)! Your message was sent — I'll get back to you soon.
             </div>
         }
         else if (_status == Status.Error)
@@ -51,12 +51,12 @@
                 <span>Send message</span>
             }
         </button>
-        <p class="form-hint"><i class="bi bi-envelope"></i> On send, your email app opens with the message pre-filled — delivered straight to my inbox.</p>
+        <p class="form-hint"><i class="bi bi-envelope"></i> Your message is delivered straight to my inbox.</p>
     </EditForm>
 </div>
 
 @code {
-    /// <summary>Address the composed email is sent to.</summary>
+    /// <summary>Address used for the mailto fallback when server-side email isn't available.</summary>
     [Parameter] public string RecipientEmail { get; set; } = "";
 
     private enum Status { Idle, Sent, Error }
@@ -64,6 +64,7 @@
     private ContactMessage _model = new();
     private Status _status = Status.Idle;
     private bool _busy;
+    private string _lastName = "";
 
     private async Task Submit()
     {
@@ -71,17 +72,26 @@
         _status = Status.Idle;
         try
         {
-            // 1) Store the message (best effort — a nice-to-have record on the server).
-            try { await Http.PostAsJsonAsync("api/contact", _model); } catch { /* non-critical */ }
-
-            // 2) Open the visitor's email client so the message reaches the inbox directly.
-            if (!string.IsNullOrWhiteSpace(RecipientEmail))
+            var name = _model.Name;
+            var res = await Http.PostAsJsonAsync("api/contact", _model);
+            if (!res.IsSuccessStatusCode)
             {
-                var subject = $"Portfolio enquiry from {_model.Name}";
-                var body = $"{_model.Message}\n\n— {_model.Name} ({_model.Email})";
+                _status = Status.Error;
+                return;
+            }
+
+            // The server stores the message and emails it. If email wasn't sent
+            // (e.g. SMTP not configured), fall back to the visitor's mail client
+            // so the message still reaches the inbox.
+            var payload = await res.Content.ReadFromJsonAsync<ContactResult>();
+            if (payload is not { emailed: true } && !string.IsNullOrWhiteSpace(RecipientEmail))
+            {
+                var subject = $"Portfolio enquiry from {name}";
+                var body = $"{_model.Message}\n\n— {name} ({_model.Email})";
                 await JS.InvokeVoidAsync("site.openMail", RecipientEmail, subject, body);
             }
 
+            _lastName = name;
             _status = Status.Sent;
             _model = new ContactMessage();
         }
@@ -93,5 +103,11 @@
         {
             _busy = false;
         }
+    }
+
+    private sealed class ContactResult
+    {
+        public bool ok { get; set; }
+        public bool emailed { get; set; }
     }
 }

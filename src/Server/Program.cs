@@ -1,12 +1,18 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using MyPersonal.Server.Data;
+using MyPersonal.Server.Services;
 using MyPersonal.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default") ?? "Data Source=app.db"));
+
+// Email delivery for the contact form (SMTP settings from the "Email" section).
+var emailOptions = builder.Configuration.GetSection("Email").Get<EmailOptions>() ?? new EmailOptions();
+builder.Services.AddSingleton(emailOptions);
+builder.Services.AddScoped<EmailSender>();
 
 var app = builder.Build();
 
@@ -54,8 +60,8 @@ api.MapPost("/visit", async (AppDbContext db) =>
     return Results.Ok(new { visits = stat.Value });
 });
 
-// Store a message from the contact form.
-api.MapPost("/contact", async (ContactMessage message, AppDbContext db) =>
+// Store a message from the contact form and email it to the site owner.
+api.MapPost("/contact", async (ContactMessage message, AppDbContext db, EmailSender email) =>
 {
     var ctx = new ValidationContext(message);
     var errors = new List<ValidationResult>();
@@ -67,7 +73,10 @@ api.MapPost("/contact", async (ContactMessage message, AppDbContext db) =>
     message.CreatedUtc = DateTime.UtcNow;
     db.Messages.Add(message);
     await db.SaveChangesAsync();
-    return Results.Ok(new { ok = true });
+
+    // Deliver to the owner's inbox (best effort — the stored copy is the fallback).
+    var emailed = await email.SendContactAsync(message);
+    return Results.Ok(new { ok = true, emailed });
 });
 
 app.MapFallbackToFile("index.html");

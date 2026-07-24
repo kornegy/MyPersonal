@@ -25,10 +25,13 @@ public static class SeedData
                 About =
                     "I am an active 3rd-year undergraduate student of Informatics at VŠB – Technical University of Ostrava. " +
                     "My expertise includes programming with Python, C# (ASP.NET), PL/SQL and relational databases. " +
+                    "I also work confidently with modern AI tools — using LLMs and AI assistants to write code faster, " +
+                    "solve problems and build AI-powered features into applications. " +
                     "During my studies I have developed several projects, which you can explore below. " +
                     "I am a quick learner, responsible, and enjoy working in a team. Currently I am looking to apply my " +
                     "skills in a practical setting — through an internship, traineeship, part-time position, or other collaboration.",
                 Location = "Ostrava, Czech Republic",
+                PhotoUrl = "img/nazar.jpg",
                 AvailabilityNote = "Open to internships, traineeships & junior roles",
                 Email = "nazark.2810@gmail.com",
                 Phone = "+420 703 031 998",
@@ -68,8 +71,8 @@ public static class SeedData
                     Items = "Blazor WebAssembly, Bootstrap, HTML, CSS, JavaScript" },
                 new SkillCategory { SortOrder = 4, Name = "Databases",
                     Items = "MS SQL Server, Oracle, PL/SQL, Relational Design, ER Diagrams" },
-                new SkillCategory { SortOrder = 5, Name = "Tools & Concepts",
-                    Items = "Git, GitHub, OOP, Software Architecture" },
+                new SkillCategory { SortOrder = 5, Name = "AI & Tools",
+                    Items = "LLMs, Prompt Engineering, AI-Assisted Development, Git, GitHub, OOP, Software Architecture" },
                 new SkillCategory { SortOrder = 6, Name = "Spoken Languages",
                     Items = "English (B2), Czech (B2), Russian (C2), Ukrainian (C2), French (A1)" }
             );

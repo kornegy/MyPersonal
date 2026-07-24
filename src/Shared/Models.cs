@@ -24,6 +24,8 @@ public class Profile
     public string TelegramUrl { get; set; } = "";
     /// <summary>Relative URL to the downloadable résumé (PDF). Blank hides the button.</summary>
     public string ResumeUrl { get; set; } = "";
+    /// <summary>Relative URL to the profile photo. Blank falls back to initials.</summary>
+    public string PhotoUrl { get; set; } = "";
 }
 
 /// <summary>A featured portfolio project.</summary>
