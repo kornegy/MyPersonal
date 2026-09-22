@@ -54,12 +54,17 @@ public class EmailSender
 
         try
         {
+            // Strip control characters (e.g. CR/LF) from visitor-supplied text
+            // before it lands in mail headers — defense in depth alongside
+            // MimeKit's own header encoding.
+            var safeName = SanitizeHeaderValue(msg.Name);
+
             var mail = new MimeMessage();
             mail.From.Add(new MailboxAddress(_options.FromName, string.IsNullOrWhiteSpace(_options.From) ? _options.User : _options.From));
             mail.To.Add(MailboxAddress.Parse(_options.To));
             // Let the owner reply straight to the visitor.
-            mail.ReplyTo.Add(new MailboxAddress(msg.Name, msg.Email));
-            mail.Subject = $"Portfolio enquiry from {msg.Name}";
+            mail.ReplyTo.Add(new MailboxAddress(safeName, msg.Email));
+            mail.Subject = $"Portfolio enquiry from {safeName}";
             mail.Body = new BodyBuilder
             {
                 TextBody =
@@ -85,4 +90,7 @@ public class EmailSender
             return false;
         }
     }
+
+    private static string SanitizeHeaderValue(string value) =>
+        new string(value.Where(c => !char.IsControl(c)).ToArray()).Trim();
 }

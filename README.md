@@ -86,23 +86,31 @@ Set `PhotoUrl` to `""` to fall back to your initials instead of a photo.
 ## Contact-form email
 
 When a visitor submits the contact form the message is stored in SQL **and**
-emailed to you. SMTP settings live in the `Email` section of
-`src/Server/appsettings.json` — everything except the **password**, which must be
-supplied as a secret and never committed.
+emailed to you. Non-secret SMTP defaults (`Host`, `Port`, `FromName`) live in the
+`Email` section of `src/Server/appsettings.json`. The account identity —
+**`User`, `Password`, `From`, `To`** — is intentionally left blank in that
+committed file and must be supplied as environment variables, so no personal
+email address or credential sits in the public repo.
 
 Using a Gmail account (recommended):
 
 1. Enable **2-Step Verification** on the Google account.
 2. Create an **App Password**: Google Account → Security → App passwords →
    generate one for "Mail". You get a 16-character code.
-3. Provide it to the app as an environment variable (note the double underscore):
+3. Provide the account details as environment variables (note the double underscore):
 
    ```bash
-   export Email__Password="your-16-char-app-password"   # Linux/macOS
+   export Email__User="you@gmail.com"
+   export Email__From="you@gmail.com"
+   export Email__To="you@gmail.com"
+   export Email__Password="your-16-char-app-password"
    dotnet run --project src/Server
    ```
    ```powershell
-   $env:Email__Password="your-16-char-app-password"     # Windows PowerShell
+   $env:Email__User="you@gmail.com"
+   $env:Email__From="you@gmail.com"
+   $env:Email__To="you@gmail.com"
+   $env:Email__Password="your-16-char-app-password"
    dotnet run --project src/Server
    ```
 
@@ -110,12 +118,27 @@ Using a Gmail account (recommended):
    ```bash
    cd src/Server
    dotnet user-secrets init
+   dotnet user-secrets set "Email:User" "you@gmail.com"
+   dotnet user-secrets set "Email:From" "you@gmail.com"
+   dotnet user-secrets set "Email:To" "you@gmail.com"
    dotnet user-secrets set "Email:Password" "your-16-char-app-password"
    ```
 
-If no password is configured, the message is still saved and the site falls back
+   **On Render**, add all four (`Email__User`, `Email__From`, `Email__To`,
+   `Email__Password`) under the Web Service's Environment tab.
+
+If these aren't configured, the message is still saved and the site falls back
 to opening the visitor's own email client — but nothing is delivered to your inbox
-automatically until the App Password is set.
+automatically.
+
+### Abuse protection
+
+`POST /api/contact` is rate-limited to 5 requests per 10 minutes per IP, and
+`POST /api/visit` to 20 per minute per IP, so the form can't be used to spam
+your inbox or flood the database. The app also sends standard hardening
+headers (CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`) and
+trusts `X-Forwarded-For`/`X-Forwarded-Proto` from the host's reverse proxy so
+rate limiting sees real client IPs.
 
 ## Design
 

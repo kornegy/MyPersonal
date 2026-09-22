@@ -15,19 +15,9 @@
 
     <base href="/" />
 
-    <!-- Set theme before first paint to avoid a flash of the wrong colour scheme. -->
-    <script>
-        (function () {
-            // Mark that JS is available, so reveal-on-scroll styling only applies
-            // when we can actually un-hide the content again.
-            document.documentElement.classList.add('js');
-            try {
-                var t = localStorage.getItem('theme') ||
-                    (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-                document.documentElement.setAttribute('data-theme', t);
-            } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
-        })();
-    </script>
+    <!-- Set theme before first paint to avoid a flash of the wrong colour scheme.
+         External file (not inline) so it works under a strict script-src 'self' CSP. -->
+    <script src="js/theme-init.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
